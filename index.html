@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SolarMobil Heliark</title>
+<style>
+:root{--bg:#070b12;--panel:#0d131d;--line:#1c2635;--tx:#e8edf5;--mu:#8e9bb0;--or:#f5a623;--gr:#46e07a;--bl:#33b5ff;--rd:#ff4d4d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.35 "Segoe UI",Inter,system-ui,sans-serif;height:100vh;display:grid;grid-template-rows:64px 1fr;overflow:hidden}
+header{display:flex;align-items:center;gap:22px;padding:0 18px;border-bottom:1px solid var(--line);background:#0a0f18}
+.logo{font-weight:800;font-style:italic;font-size:19px;letter-spacing:.5px}.logo small{color:var(--or)}
+.hz{letter-spacing:9px;font-weight:300;font-size:21px;color:#cfd7e6;border-left:1px solid var(--line);padding-left:18px}
+.hd{border-left:1px solid var(--line);padding-left:16px;font-size:12px;color:var(--mu)}.hd b{color:var(--tx);font-size:13px}
+.race{border:1px solid var(--or);color:var(--or);padding:8px 16px;border-radius:6px;font-weight:700;background:#2a1d08}
+.live{color:var(--gr);font-weight:700}.live:before{content:"●";margin-right:6px}.sp{margin-left:auto}
+main{display:grid;grid-template-columns:190px 1fr 300px;min-height:0}
+nav{border-right:1px solid var(--line);padding:10px 0;display:flex;flex-direction:column;gap:2px}
+nav a{padding:13px 22px;color:#c3cce0;display:block}nav a.on{background:linear-gradient(90deg,#3a2a0c,transparent);color:var(--or);border-left:3px solid var(--or)}
+.ctrl{margin-top:auto;padding:14px;font-size:11px;color:var(--mu)}.ctrl input{width:100%}
+.mid{display:grid;grid-template-rows:auto 1fr 215px;gap:10px;padding:10px;min-height:0}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.card,.kpi,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.kpi{padding:10px;text-align:center}.kpi:first-child{border-left:3px solid var(--or)}.kpi span{color:var(--mu);font-size:11px}.kpi b{display:block;font-size:26px;font-weight:600;margin-top:4px}.kpi b i{font-size:15px;font-weight:400;font-style:normal;color:#c3cce0}
+.bar{height:5px;background:#1b2433;border-radius:3px;margin-top:4px}.bar div{height:100%;background:var(--rd);border-radius:3px}
+.map{position:relative;overflow:hidden}.map h2{margin:12px 16px 0;font-size:18px}.map p{margin:2px 16px;color:var(--mu)}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.leg{position:absolute;left:16px;bottom:12px;font-size:11px;color:#c3cce0}.leg i{display:inline-block;width:26px;height:3px;margin-right:8px;vertical-align:middle}
+.bot{display:grid;grid-template-columns:1.9fr 1fr 1fr;gap:10px;min-height:0}
+.panel{padding:10px 14px;min-height:0}.panel h3{margin:0 0 6px;font-size:14px}.panel h3 em{font-style:normal;font-weight:400;color:var(--mu);font-size:11px}
+.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #141c29}.row b{color:var(--gr);font-weight:500}.row.w b{color:var(--tx)}.row.big b{color:var(--tx);font-size:14px}
+.side{padding:10px 10px 10px 0;display:flex;flex-direction:column;gap:8px;overflow:auto}
+canvas{width:100%;height:150px;display:block}.lg{font-size:11px;display:flex;gap:16px;justify-content:center;color:#c3cce0}.lg i{display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:middle}
+.warn b{color:var(--rd)!important}
+</style></head><body>
+<header><div class="logo">SOLARMOBIL<br><small>▔▔▔</small></div><div class="hz">HELIARK</div>
+<div class="hd"><b>SEVC 2026</b><br>Solar Electric Vehicle Championship</div>
+<div class="hd">Car: <b>HELIARK #26012</b><br>Configuration: 2F1R (HEV)</div>
+<div class="hd"><b>Kari Motor Speedway</b><br>Coimbatore, India</div>
+<div class="hd" id="wx"></div><div class="race">RACE MODE</div>
+<div class="hd" style="font-size:20px;color:var(--tx)"><span id="clk"></span><br><span style="font-size:12px;color:var(--mu)" id="dt"></span></div><div class="live" id="live">LIVE</div></header>
+<main><nav><a class="on">Overview</a><a>Live Race</a><a>Digital Twin</a><a>Track Simulator</a><a>Race Strategy</a><a>System Health</a><a>Reports</a>
+<div class="ctrl">Replay speed <span id="spv">1×</span><input type="range" id="sp" min="1" max="30" value="1"><br><br><span id="idx"></span></div></nav>
+<div class="mid"><div class="kpis" id="kpis"></div>
+<div class="panel map card"><h2>Kari Motor Speedway</h2><p>Circuit Length: 2.10 km &nbsp;|&nbsp; Turns: 14 (ref.)</p>
+<svg viewBox="213 237 1130 403" preserveAspectRatio="xMidYMid meet"><defs><radialGradient id="g" cx=".5" cy=".5" r=".7"><stop offset="0" stop-color="#1b2a1d"/><stop offset="1" stop-color="#0b120d"/></radialGradient></defs>
+<rect x="213" y="237" width="1130" height="403" fill="url(#g)"/>
+<path id="trk" d="M437 465 L700 447 L1150 406 Q1200 410 1190 470 L1195 540 Q1210 575 1250 570 Q1285 550 1270 490 L1245 396 Q1200 310 1150 298 Q1110 295 1105 330 L1090 355 L945 345 L810 352 L760 365 L715 375 L705 410 L640 415 L530 415 L480 385 L300 425 Q255 430 255 465 Q258 485 290 488 L395 487 Q420 470 437 465Z" fill="none" stroke="#fff" stroke-width="11" stroke-linejoin="round"/>
+<g id="tn" font-size="13" fill="#fff" text-anchor="middle"></g><circle id="car" r="9" fill="var(--or)" stroke="#fff" stroke-width="3"/></svg>
+<div class="leg"><div><i style="background:#f5a623"></i>Sector 1 (T1 – T4)</div><div><i style="background:#33b5ff"></i>Sector 2 (T5 – T8)</div><div><i style="background:#ff4d4d"></i>Sector 3 (T9 – T14)</div></div></div>
+<div class="bot"><div class="panel"><h3>Synchronized Telemetry <em>(replay, last 60 s)</em></h3><canvas id="cv" width="900" height="300"></canvas>
+<div class="lg"><span><i style="background:#f5a623"></i>Speed (km/h)</span><span><i style="background:#33b5ff"></i>Motor Current (A)</span><span><i style="background:#46e07a"></i>Pack Voltage (V)</span><span><i style="background:#ff4d4d"></i>Motor Temp (°C)</span></div></div>
+<div class="panel"><h3>Race Strategy</h3><div id="st"></div></div><div class="panel"><h3>Digital Twin Validation</h3><div id="tw"></div></div></div></div>
+<div class="side" id="side"></div></main>
+<script>
+const $=id=>document.getElementById(id),f1=(v,d=1)=>v==null?"–":(+v).toFixed(d);
+const R=(k,v,c="")=>`<div class="row ${c}"><span>${k}</span><b>${v}</b></div>`;
+const turns=[[480,380],[640,399],[823,336],[780,412],[1116,292],[1090,375],[1247,396],[1288,548],[1183,452],[700,456],[395,500],[272,497],[297,404],[437,465]];
+const tp=$("trk");$("tn").innerHTML=turns.slice(0,13).map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="12" fill="#0b0f16" stroke="#fff"/><text x="${p[0]}" y="${p[1]+4}">${i+1}</text>`).join("");
+let i=0,speed=1,len=tp.getTotalLength();$("sp").oninput=e=>{speed=+e.target.value;$("spv").textContent=speed+"×"};
+function chart(s){const c=$("cv"),x=c.getContext("2d"),W=c.width,H=c.height;x.clearRect(0,0,W,H);x.font="12px sans-serif";x.fillStyle="#8e9bb0";
+ x.strokeStyle="#1c2635";for(let k=0;k<=4;k++){const y=10+k*(H-30)/4;x.beginPath();x.moveTo(40,y);x.lineTo(W-40,y);x.stroke();x.fillText(100-k*25,8,y+4);x.fillText(125-k*31.25|0,W-34,y+4)}
+ const L=[["speed_kmph","#f5a623",0,100],["motor_phase_current_A","#33b5ff",0,100],["pack_voltage_V","#46e07a",0,125],["motor_temp_C","#ff4d4d",0,125]];
+ for(const[k,col,a,b]of L){const d=s[k];x.strokeStyle=col;x.lineWidth=2;x.beginPath();d.forEach((v,j)=>{const px=40+j*(W-80)/59,py=10+(H-30)*(1-(v-a)/(b-a));j?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}}
+function render(d){const f=d.frame,t=d.twin,st=d.strategy,flt=f.fault_code;
+ const ts=f.timestamp_ist.split(" ");$("clk").textContent=ts[1];$("dt").textContent=ts[0];$("idx").textContent=`Lap ${f.lap} · t=${f.elapsed_s}s`;
+ $("wx").innerHTML=`<b style="color:var(--tx);font-size:18px">☀ ${f1(f.ambient_temp_C,0)} °C</b><br>Irradiance: ${f1(f.irradiance_ghi_Wm2,0)} W/m²`;
+ $("live").style.color=f.xbee_link_ok?"var(--gr)":"var(--rd)";$("live").textContent=f.xbee_link_ok?"LIVE":"LINK LOST";
+ const K=[["Speed",f1(f.speed_kmph),"km/h"],["SOC",f1(f.soc_pct),"%"],["Motor RPM",f1(f.motor_rpm,0),"rpm"],["Pack Voltage",f1(f.pack_voltage_V),"V"],["Motor Temp",f1(f.motor_temp_C),"°C"],["Solar Power",f1(f.solar_array_power_W,0),"W"]];
+ $("kpis").innerHTML=K.map((k,j)=>`<div class="kpi"><span>${k[0]}</span><b>${k[1]} <i>${k[2]}</i></b>${j==1?`<div class="bar"><div style="width:${f.soc_pct}%;background:${f.soc_pct<20?"var(--rd)":"var(--gr)"}"></div></div>`:""}</div>`).join("");
+ const p=tp.getPointAtLength(d.track_frac*len);$("car").setAttribute("cx",p.x);$("car").setAttribute("cy",p.y);
+ $("side").innerHTML=`<div class="panel"><h3>Vehicle Health</h3>${flt?`<div class="warn">${R("Fault code",flt)}</div>`:'<div class="row"><span style="color:var(--gr)">✔ All Systems Nominal</span></div>'}</div>
+ <div class="panel"><h3>Powertrain</h3>${R("Motor Current",f1(f.motor_phase_current_A)+" A")}${R("Motor Torque",f1(f.motor_torque_Nm)+" Nm")}${R("Controller Temp",f1(f.controller_temp_C)+" °C")}${R("Efficiency (Est.)",f1(f.motor_efficiency_pct)+" %")}</div>
+ <div class="panel"><h3>Battery System</h3>${R("Pack Voltage",f1(f.pack_voltage_V)+" V")}${R("Pack Current",f1(f.pack_current_A)+" A")}${R("SOC",f1(f.soc_pct)+" %")}${R("Pack Temp (Avg)",f1((f.pack_a_temp_C+f.pack_b_temp_C)/2)+" °C")}${R("SOH (Est.)",f1(f.soh_pct,0)+" %")}</div>
+ <div class="panel"><h3>Solar System</h3>${R("Array Power",f1(f.solar_array_power_W,0)+" W")}${R("Array Voltage",f1(f.solar_array_voltage_V)+" V")}${R("Array Current",f1(f.solar_array_current_A)+" A")}${R("Irradiance",f1(f.irradiance_ghi_Wm2,0)+" W/m²")}${R("Energy (Cum.)",f1(f.solar_energy_cum_Wh/1000,3)+" kWh")}</div>`;
+ const m=s=>{s=Math.round(s);return String(s/60|0).padStart(2,"0")+":"+(s%60).toFixed(0).padStart(2,"0")+".0"};
+ $("st").innerHTML=R("Target Lap Time",m(st.target_lap),"w big")+R("Pred. Energy / Lap",f1(st.energy_lap_wh)+" Wh","w big")+R("Pred. Finish SOC",f1(st.finish_soc)+" %","w big")+R("Race Remaining",f1(st.remaining_min,0)+" min","w big");
+ $("tw").innerHTML=R("Speed MAE",f1(t.speed_mae,2)+" km/h","w big")+R("Speed RMSE",f1(t.speed_rmse,2)+" km/h","w big")+R("Voltage MAE",f1(t.volt_mae,2)+" V","w big")+R("Model Correlation (R²)",f1(t.r2,3),"w big")+R("SEVC Rulebook",t.compliant?"100% Compliant":"VIOLATION","big");
+ chart(d.series)}
+async function tick(){try{const r=await fetch(`/api/state?i=${i}`);render(await r.json());i=(i+speed)%7200}catch(e){$("live").textContent="OFFLINE";$("live").style.color="var(--rd)"}setTimeout(tick,1000)}
+tick();
+</script></body></html>
